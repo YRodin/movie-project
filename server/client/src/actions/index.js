@@ -1,76 +1,124 @@
 import axios from "axios";
-import { FETCH_MOVIES, FETCH_MOVIE, AUTH_USER, AUTH_ERROR } from './types';
+import {
+  FETCH_MOVIES,
+  FETCH_MOVIE,
+  AUTH_USER,
+  AUTH_ERROR,
+  ADD_MOVIE,
+  FETCH_WATCHLIST_MOVIES
+} from "./types";
 
-export const fetchMovies = (page = 1) => dispatch => {
-  axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=a50dd974dc6bceb5358b37229983facc&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=${page}`
-  ).then(function (response) {
-    dispatch({ type: FETCH_MOVIES, payload: response.data });
-  })
-  .catch(function (error) {
-    console.log(error);
-  });
-};
-
-export const fetchMovie = (id) => dispatch => {
-  axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=a50dd974dc6bceb5358b37229983facc&include_adult=false&include_video=false`
-  ).then(function (response) {
-    dispatch({ type: FETCH_MOVIE, payload: response.data });
-  })
-  .catch(function (error) {
-    console.log(error);
-  });
-};
-
-export const signup = (formProps, callback) => dispatch => {
-  axios.post(
-    'http://localhost:5000/auth/signup',
-    formProps
-  ).then(function (response) {
-    dispatch({ type: AUTH_USER, payload: response.data });
-    localStorage.setItem('token', response.data.token);
-    callback();
-  })
-  .catch(function (error) {
-    dispatch({ type: AUTH_ERROR, payload: error });
-  });
-};
-
-export const signin = (formProps, callback) => dispatch => {
-  axios.post(
-    'http://localhost:5000/auth/signin',
-    formProps
-  ).then(function (response) {
-    dispatch({ type: AUTH_USER, payload: response.data });
-    localStorage.setItem('token', response.data.token);
-    callback();
-  })
-  .catch(function (error) {
-    dispatch({ type: AUTH_ERROR, payload: error });
-  });
-};
-
-export const fetchUser = () => dispatch => {
-  const config = {
-    headers: {
-      Authorization: 'Bearer ' + localStorage.getItem('token'),
-    }
+export const fetchMovies =
+  (page = 1) =>
+  (dispatch) => {
+    axios
+      .get(
+        `https://api.themoviedb.org/3/discover/movie?api_key=a50dd974dc6bceb5358b37229983facc&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=${page}`
+      )
+      .then(function (response) {
+        dispatch({ type: FETCH_MOVIES, payload: response.data });
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   };
 
-  axios.get(
-    'http://localhost:5000/auth/current_user',
-    config
-  ).then(function (response) {
-    dispatch({ type: AUTH_USER, payload: response.data });
-    localStorage.setItem('token', response.data.token);
-  })
-  .catch(function (error) {
-    console.log(error);
-  });
+export const fetchMovie = (id) => (dispatch) => {
+  axios
+    .get(
+      `https://api.themoviedb.org/3/movie/${id}?api_key=a50dd974dc6bceb5358b37229983facc&include_adult=false&include_video=false`
+    )
+    .then(function (response) {
+      dispatch({ type: FETCH_MOVIE, payload: response.data });
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
 };
 
-export const signout = (callback) => dispatch => {
-  localStorage.removeItem('token');
+export const signup = (formProps, callback) => (dispatch) => {
+  axios
+    .post("http://localhost:5001/auth/signup", formProps)
+    .then(function (response) {
+      dispatch({ type: AUTH_USER, payload: response.data });
+      localStorage.setItem("token", response.data.token);
+      callback();
+    })
+    .catch(function (error) {
+      dispatch({ type: AUTH_ERROR, payload: error });
+    });
+};
 
-  dispatch({ type: AUTH_USER, payload: '' });
-  callback()
+export const signin = (formProps, callback) => (dispatch) => {
+  axios
+    .post("http://localhost:5001/auth/signin", formProps)
+    .then(function (response) {
+      dispatch({ type: AUTH_USER, payload: response.data });
+      localStorage.setItem("token", response.data.token);
+      callback();
+    })
+    .catch(function (error) {
+      dispatch({ type: AUTH_ERROR, payload: error });
+    });
+};
+
+export const fetchUser = () => (dispatch) => {
+  const config = {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("token"),
+    },
+  };
+
+  axios
+    .get("http://localhost:5001/auth/current_user", config)
+    .then(function (response) {
+      dispatch({ type: AUTH_USER, payload: response.data });
+      localStorage.setItem("token", response.data.token);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+};
+
+export const signout = (callback) => (dispatch) => {
+  localStorage.removeItem("token");
+  dispatch({ type: AUTH_USER, payload: "" });
+  callback();
+};
+
+export const addMovieToWatchList = (movie) => (dispatch) => {
+  const config = {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("token"),
+    },
+  };
+
+  axios
+    .post("http://localhost:5001/api/watchList", { movie }, config)
+    .then(function (response) {
+      
+      dispatch({ type: ADD_MOVIE, payload: response.data });
+    })
+    .catch(function (error) {
+      
+      console.log(error);
+    });
+};
+
+export const fetchWatchListMovies = () => dispatch => {
+  const config = {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("token"),
+    },
+  };
+
+  axios
+    .get("http://localhost:5001/api/watchList", config)
+    .then(function (response) {
+      dispatch({ type: FETCH_WATCHLIST_MOVIES, payload: response.data });
+    })
+    .catch(function (error) {
+      console.log('then block fired in fetchWatchListMovies action creator')
+      console.log(error);
+    });
 };

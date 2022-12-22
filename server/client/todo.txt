@@ -1,0 +1,12 @@
+onclick of Sign Out on the client:
+
+- create a new key for unAuth;
+
+- remove token from local storage (in action creator)
+
+- create a reducer and action type for UnAuth
+
+- dispatch (UnAuth) action to:
+  remove user email and token from redux state
+
+- redirect to signin/signup page

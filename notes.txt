@@ -1,0 +1,1 @@
+watchlist.js returns undefined user.watchlist prop and crashes server.
